@@ -6,7 +6,9 @@
 //  Copyright (c) 2014 CreoLabs. All rights reserved.
 //
 
+#include <assert.h>
 #include <inttypes.h>
+#include "debug_macros.h"
 #include "gravity_hash.h"
 #include "gravity_core.h"
 #include "gravity_value.h"

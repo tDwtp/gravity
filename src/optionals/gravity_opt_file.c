@@ -6,11 +6,13 @@
 //  Copyright © 2020 Creolabs. All rights reserved.
 //
 
+#include "debug_macros.h"
 #include "gravity_vm.h"
 #include "gravity_core.h"
 #include "gravity_hash.h"
 #include "gravity_utils.h"
 #include "gravity_macros.h"
+#include "gravity_memory.h"
 #include "gravity_vmmacros.h"
 #include "gravity_opt_file.h"
 

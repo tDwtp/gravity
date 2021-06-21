@@ -9,11 +9,10 @@
 #ifndef __GRAVITY_VALUES__
 #define __GRAVITY_VALUES__
 
-#include "gravity_memory.h"
+#include <float.h>
 #include "gravity_utils.h"
 #include "gravity_array.h"
 #include "gravity_json.h"
-#include "debug_macros.h"
 
 // Gravity is a dynamically typed language so a variable (gravity_value_t) can hold a value of any type.
 

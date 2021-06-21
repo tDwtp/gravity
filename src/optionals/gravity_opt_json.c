@@ -13,6 +13,7 @@
 #include "gravity_json.h"
 #include "gravity_utils.h"
 #include "gravity_macros.h"
+#include "gravity_memory.h"
 #include "gravity_opcodes.h"
 #include "gravity_vmmacros.h"
 #include "gravity_opt_json.h"

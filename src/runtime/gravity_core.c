@@ -9,6 +9,7 @@
 #include <inttypes.h>
 #include <math.h>
 #include <time.h>
+#include <assert.h>
 #include <stdlib.h>
 #include "gravity_core.h"
 #include "gravity_hash.h"

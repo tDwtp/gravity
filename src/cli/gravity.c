@@ -6,6 +6,8 @@
 //  Copyright © 2016 CreoLabs. All rights reserved.
 //
 
+#include <assert.h>
+#include "gravity_memory.h"
 #include "gravity_compiler.h"
 #include "gravity_optionals.h"
 #include "gravity_utils.h"

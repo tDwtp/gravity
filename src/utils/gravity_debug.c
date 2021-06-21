@@ -9,6 +9,7 @@
 #include <assert.h>
 #include "gravity_value.h"
 #include "gravity_debug.h"
+#include "gravity_memory.h"
 #include "gravity_vmmacros.h"
 
 const char *opcode_constname (int n) {

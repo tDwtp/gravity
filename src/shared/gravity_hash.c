@@ -9,6 +9,7 @@
 #include <inttypes.h>
 #include "gravity_hash.h"
 #include "gravity_macros.h"
+#include "gravity_memory.h"
 
 #if GRAVITYHASH_ENABLE_STATS
 #define INC_COLLISION(tbl)      ++tbl->ncollision
