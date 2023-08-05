@@ -3197,6 +3197,83 @@ static bool system_exit (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, 
     RETURN_NOVALUE();
 }
 
+static bool system_error (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    gravity_string_t *message;
+    gravity_value_t value;
+    
+    if (!nargs) {
+        gravity_vm_seterror_string(gravity_vm_fiber(vm), "");
+        gravity_vm_setslot(vm, VALUE_FROM_NULL, rindex);
+        return false;
+    }
+    
+    value = GET_VALUE(1);
+    INTERNAL_CONVERT_STRING(value, true);
+    message = VALUE_AS_STRING(value);
+    
+    
+    if (nargs == 1) {
+        gravity_vm_seterror_string(gravity_vm_fiber(vm), message->s);
+        gravity_vm_setslot(vm, VALUE_FROM_NULL, rindex);
+        return false;
+    }
+    
+    
+    
+    
+    
+}
+
+// MARK: - System -
+
+static bool module_resolve (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    
+    
+    
+    
+    
+    RETURN_NOVALUE();
+}
+
+static bool module_paths_get (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    
+    
+    
+    
+    
+    RETURN_NOVALUE();
+}
+
+static bool module_paths_set (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    
+    
+    
+    
+    
+    
+    RETURN_NOVALUE();
+}
+
+static bool module_extensions_get (gravity_vm *vm, gravity_value_t *args, uint16_t nargs, uint32_t rindex) {
+    // Linux:   "*.gravity", "*.g", "*.so"
+    // MacOS:   "*.gravity", "*.g", "*.so", "*.bundle"
+    // Windows: "*.gravity", "*.g", "*.dll"
+    char **extensions = {
+        "gravity", "g",
+#if defined(WIN32) || defined(_WIN64) || defined(_WIN32)
+        "dll",
+#else
+        "so",
+    #if defined(__MACH__) || defined(__APPLE__)
+        "bundle",
+    #endif
+#endif
+        NULL
+    }
+    
+    
+    RETURN_NOVALUE();
+}
 
 // MARK: - CORE -
 
@@ -3295,7 +3372,7 @@ void gravity_core_init (void) {
     gravity_class_instance = gravity_class_new_pair(NULL, GRAVITY_CLASS_INSTANCE_NAME, NULL, 0, 0);
     gravity_class_closure = gravity_class_new_pair(NULL, GRAVITY_CLASS_CLOSURE_NAME, NULL, 0, 0);
     gravity_class_upvalue = gravity_class_new_pair(NULL, GRAVITY_CLASS_UPVALUE_NAME, NULL, 0, 0);
-    gravity_class_module = NULL;
+    // gravity_class_module = gravity_class_new_pair(NULL, GRAVITY_CLASS_MODULE_NAME, NULL, 0, 0);
 
     // create intrinsic classes (intrinsic datatypes are: Int, Float, Bool, Null, String, List, Map and Range)
     gravity_class_int = gravity_class_new_pair(NULL, GRAVITY_CLASS_INT_NAME, NULL, 0, 0);
@@ -3551,6 +3628,7 @@ void gravity_core_init (void) {
     gravity_class_bind(system_meta, GRAVITY_SYSTEM_PRINT_NAME, NEW_CLOSURE_VALUE(system_print));
     gravity_class_bind(system_meta, GRAVITY_SYSTEM_PUT_NAME, NEW_CLOSURE_VALUE(system_put));
     gravity_class_bind(system_meta, GRAVITY_SYSTEM_INPUT_NAME, NEW_CLOSURE_VALUE(system_input));
+    gravity_class_bind(system_meta, "error", NEW_CLOSURE_VALUE(system_error));
     gravity_class_bind(system_meta, "exit", NEW_CLOSURE_VALUE(system_exit));
 
     closure = computed_property_create(NULL, NEW_FUNCTION(system_get), NEW_FUNCTION(system_set));
@@ -3562,7 +3640,24 @@ void gravity_core_init (void) {
     gravity_class_bind(system_meta, GRAVITY_VM_MAXCALLS, value);
     gravity_class_bind(system_meta, GRAVITY_VM_MAXBLOCK, value);
     gravity_class_bind(system_meta, GRAVITY_VM_MAXRECURSION, value);
+
+    /*/ Module class
+    gravity_class_bind(gravity_class_module, "resolve", NEW_CLOSURE_VALUE(module_resolve));
+    closure = computed_property_create(NULL, NEW_FUNCTION(module_paths_get), NEW_FUNCTION(module_paths_set));
+    gravity_class_bind(gravity_class_module, "paths", VALUE_FROM_OBJECT(closure));
+    gravity_class_bind(gravity_class_module, "extensions", VALUE_FROM_OBJECT(computed_property_create(NULL, NEW_FUNCTION(module_extensions_get), NULL)));
+    // gravity_class_bind(gravity_class_module, )
+    // closure = computed_property_create(NULL, NEW_FUNCTION(getter), NEW_FUNCTION(setter));
+    // gravity_class_bind(gravity_class_module, property_name, VALUE_FROM_OBJECT(closure));
+    // gravity_class_bind(gravity_class_module, field_name, value); // NEW_CLOSURE_VALUE(operator_float_not)
+    // gravity_class_bind(gravity_class_module, "resolveScript", NEW_CLOSURE_VALUE(module_resolve_script));
+    // gravity_class_bind(gravity_class_module, "resolveCompiled", NEW_CLOSURE_VALUE(module_resolve_compiled));
+    // gravity_class_bind(gravity_class_module, "resolveNative", NEW_CLOSURE_VALUE(module_resolve_native));
+    //*/
     
+    
+    
+
     // INIT META
     SETMETA_INITED(gravity_class_int);
     SETMETA_INITED(gravity_class_float);
@@ -3580,7 +3675,7 @@ void gravity_core_init (void) {
     SETMETA_INITED(gravity_class_range);
     SETMETA_INITED(gravity_class_upvalue);
     SETMETA_INITED(gravity_class_system);
-    //SETMETA_INITED(gravity_class_module);
+    // SETMETA_INITED(gravity_class_module);
 
     //mem_check(true);
 }

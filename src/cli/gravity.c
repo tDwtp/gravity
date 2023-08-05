@@ -61,8 +61,11 @@ static void report_error (gravity_vm *vm, error_type_t error_type, const char *m
 	printf("%s\n", message);
 }
 
+static const char *lookup_find (uint32_t index);
+static uint32_t lookup_add (const char *value);
+
 static const char *load_file (const char *file, size_t *size, uint32_t *fileid, void *xdata, bool *is_static) {
-    (void) fileid, (void) xdata;
+    (void) xdata;
 
 	// this callback is called each time an import statement is parsed
 	// file arg represents what user wrote after the import keyword, for example:
@@ -89,7 +92,107 @@ static const char *load_file (const char *file, size_t *size, uint32_t *fileid, 
 
     if (is_static) *is_static = false;
 	if (!file_exists(file)) return NULL;
+	*fileid = lookup_add(file);
 	return file_read(file, size);
+}
+
+const char *find_filename (uint32_t fileid, void *xdata) {
+    ((void)xdata);
+    return lookup_find(fileid);
+}
+
+uint32_t lookup_reverse(uint32_t n) {
+    uint32_t r = 0;
+    for (unsigned i = 0; i < 32; ++i)
+        r |= ((n>>i)&1) << (31-i);
+    return r;
+}
+
+typedef struct lookup lookup;
+struct lookup {
+    uint32_t index;
+    const char *value;
+    lookup* upper;
+    lookup* lower;
+};
+static lookup base = { 0, 0, 0, 0 };
+
+static lookup *lookup_nearest(lookup *base, uint32_t index) {
+    if (base->index < index && base->upper) {
+        return lookup_nearest(base->upper, index);
+    } else if (base->index > index && base->lower) {
+        return lookup_nearest(base->lower, index);
+    }
+    return base;
+}
+
+static const char* lookup_find (uint32_t index) {
+    index = lookup_reverse(index);
+    lookup *nearest = lookup_nearest(&base, index);
+    if (index == nearest->index)
+        return string_dup(nearest->value);
+    return "(null)";
+}
+
+uint32_t lookup_append(lookup *insert) {
+    lookup *nearest = lookup_nearest(&base, insert->index);
+    
+    if (nearest->index < insert->index) {
+        nearest->upper = insert;
+    }
+    else if (nearest->index > insert->index) {
+        nearest->lower = insert;
+    }
+    else {
+        // error: delete and return 0!
+        if (insert->value)
+            free((void*)insert->value);
+        free(insert);
+        return 0;
+    }
+    
+    return insert->index;
+}
+
+static void lookup_clear (lookup *next) {
+    if (!next) return;
+    
+    next->index = 0;
+    
+    if (next->value) free((void*)next->value); next->value = 0;
+    if (next->upper) lookup_clear(next->upper); next->upper = 0;
+    if (next->value) lookup_clear(next->lower); next->lower = 0;
+    
+    free(next);
+}
+
+uint32_t lookup_add (const char *value) {
+    static uint32_t current = 0;
+    ++current;
+    
+    if (!value) {
+        current = 0;
+        base.index = 0;
+        if (base.value) free((void*)base.value);
+        lookup_clear(base.upper); base.upper = 0;
+        lookup_clear(base.lower); base.lower = 0;
+        return 0;
+    }
+    
+    if (current == 1) {
+        base.index = lookup_reverse(current);
+        base.value = string_dup(value);
+        return base.index;
+    }
+    
+    lookup *next = malloc(sizeof(lookup));
+    
+    next->index = lookup_reverse(current);
+    next->value = string_dup(value);
+    next->upper = 0;
+    next->lower = 0;
+    
+    return lookup_append(next);
 }
 
 // MARK: - Unit Test -

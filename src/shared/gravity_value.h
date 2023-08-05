@@ -10,6 +10,7 @@
 #define __GRAVITY_VALUES__
 
 #include "gravity_common.h"
+#include "gravity_config.h"
 
 #include "gravity_memory.h"
 #include "gravity_utils.h"
@@ -66,35 +67,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#define GRAVITY_VERSION						"0.8.2"     // git tag 0.8.2
-#define GRAVITY_VERSION_NUMBER				0x000802    // git push --tags
-#define GRAVITY_BUILD_DATE                  __DATE__
-
-#ifndef GRAVITY_ENABLE_DOUBLE
-#define GRAVITY_ENABLE_DOUBLE               1           // if 1 enable gravity_float_t to be a double (instead of a float)
-#endif
-
-#ifndef GRAVITY_ENABLE_INT64
-#define GRAVITY_ENABLE_INT64                1           // if 1 enable gravity_int_t to be a 64bit int (instead of a 32bit int)
-#endif
-
-#ifndef GRAVITY_COMPUTED_GOTO
-#define GRAVITY_COMPUTED_GOTO               1           // if 1 enable faster computed goto (instead of switch) for compilers that support it
-#endif
-
-#ifndef GRAVITY_NULL_SILENT
-#define GRAVITY_NULL_SILENT                 1           // if 1 then messages sent to null does not produce any runtime error
-#endif
-
-#ifndef GRAVITY_MAP_DOTSUGAR
-#define GRAVITY_MAP_DOTSUGAR                1           // if 1 then map objects can be accessed with both map[key] and map.key
-#endif
-
-#if defined(_MSC_VER) && !defined(__clang__)
-#undef GRAVITY_COMPUTED_GOTO
-#define GRAVITY_COMPUTED_GOTO               0           // MSVC does not support computed goto (supported if using clang on Windows)
 #endif
 
 #define MAIN_FUNCTION                       "main"
